@@ -493,7 +493,7 @@ export function EncountersView() {
 
       {/* Location List */}
       <div className="flex-1 overflow-auto">
-        <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div className="p-4 pb-24 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           <AnimatePresence>
             {locations.map((location) => (
               <EncounterLocationCard

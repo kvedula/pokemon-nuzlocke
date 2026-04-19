@@ -559,7 +559,7 @@ export function PokedexView() {
       {/* Pokemon Grid/List */}
       <div className="flex-1 overflow-auto">
         <div className={cn(
-          'p-4',
+          'p-4 pb-24',
           viewMode === 'grid' 
             ? 'grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2'
             : 'space-y-2'

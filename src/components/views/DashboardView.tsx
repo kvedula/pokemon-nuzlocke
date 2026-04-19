@@ -80,7 +80,7 @@ export function DashboardView() {
 
       {/* Main Content - Scrollable */}
       <div className="flex-1 overflow-y-auto min-h-0">
-        <div className="p-4 pt-2 space-y-6">
+        <div className="p-4 pt-2 pb-24 space-y-6">
           {/* Row 1: Team + Next Steps side by side */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             {/* Team - Takes 2 columns */}

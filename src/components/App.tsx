@@ -42,6 +42,7 @@ import {
   Sun,
   Plus,
   PanelLeftOpen,
+  Sparkles,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -218,6 +219,10 @@ export function App() {
             <CommandItem onSelect={() => { setActiveTab('walkthrough'); toggleCommandPalette(); }}>
               <ScrollText className="mr-2 h-4 w-4" />
               Walkthrough Guide
+            </CommandItem>
+            <CommandItem onSelect={() => { setActiveTab('extras'); toggleCommandPalette(); }}>
+              <Sparkles className="mr-2 h-4 w-4" />
+              Extra Trackers
             </CommandItem>
           </CommandGroup>
           <CommandSeparator />

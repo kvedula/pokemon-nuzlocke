@@ -27,6 +27,8 @@ import {
   Coins,
   RefreshCw,
   Undo2,
+  TrendingUp,
+  Clock,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -57,9 +59,9 @@ interface RunContext {
   pokedexCaught: number;
 }
 
-type ActiveTab = 'dashboard' | 'map' | 'walkthrough' | 'team' | 'encounters' | 'rules' | 'timeline' | 'pokedex';
+type ActiveTab = 'dashboard' | 'map' | 'walkthrough' | 'team' | 'encounters' | 'rules' | 'timeline' | 'pokedex' | 'extras';
 
-const VALID_TABS: ActiveTab[] = ['dashboard', 'map', 'walkthrough', 'team', 'encounters', 'rules', 'timeline', 'pokedex'];
+const VALID_TABS: ActiveTab[] = ['dashboard', 'map', 'walkthrough', 'team', 'encounters', 'rules', 'timeline', 'pokedex', 'extras'];
 
 const BADGE_MAP: Record<string, string> = {
   'boulder': 'boulder-badge',
@@ -99,9 +101,11 @@ interface ActionHandlers {
   catchPokemon: (speciesName: string, nickname: string, level: number, locationId: string) => string | null;
   updatePokemon: (nickname: string, field: string, value: string) => boolean;
   updatePokemonStats: (nickname: string, stats: PokemonStats) => boolean;
+  evolvePokemon: (nickname: string, newSpeciesName: string) => boolean;
   getPokemonByNickname: (nickname: string) => Pokemon | null;
   updateInventory: (itemName: string, quantity: number, category: string) => void;
   updateMoney: (amount: number) => void;
+  updatePlayTime: (totalMinutes: number) => void;
   syncProgressTo: (locationId: string) => { locationsVisited: number; trainersDefeated: number };
   unclearLocation: (locationId: string) => boolean;
   undefeatTrainers: (locationId: string) => number;
@@ -228,6 +232,18 @@ function parseActions(content: string, handlers: ActionHandlers): { cleanedConte
   }
   cleanedContent = cleanedContent.replace(updateStatsRegex, '');
   
+  // Evolve Pokemon actions
+  const evolveRegex = /\[ACTION:evolvePokemon:([^|]+)\|([^\]]+)\]/g;
+  while ((match = evolveRegex.exec(content)) !== null) {
+    const [, nickname, newSpeciesName] = match;
+    setTimeout(() => handlers.evolvePokemon(nickname, newSpeciesName), 100);
+    executedActions.push({ 
+      type: 'evolve', 
+      description: `Evolved ${nickname} to ${newSpeciesName}` 
+    });
+  }
+  cleanedContent = cleanedContent.replace(evolveRegex, '');
+  
   // Inventory actions
   const itemRegex = /\[ACTION:setItem:([^|]+)\|(\d+)\|(\w+)\]/g;
   while ((match = itemRegex.exec(content)) !== null) {
@@ -252,6 +268,20 @@ function parseActions(content: string, handlers: ActionHandlers): { cleanedConte
     });
   }
   cleanedContent = cleanedContent.replace(moneyRegex, '');
+  
+  // Play time actions
+  const playTimeRegex = /\[ACTION:setPlayTime:(\d+)\|(\d+)\]/g;
+  while ((match = playTimeRegex.exec(content)) !== null) {
+    const hours = parseInt(match[1], 10);
+    const minutes = parseInt(match[2], 10);
+    const totalMinutes = (hours * 60) + minutes;
+    setTimeout(() => handlers.updatePlayTime(totalMinutes), 100);
+    executedActions.push({ 
+      type: 'playtime', 
+      description: `Set play time to ${hours}h ${minutes}m` 
+    });
+  }
+  cleanedContent = cleanedContent.replace(playTimeRegex, '');
   
   // Progress sync actions
   const syncRegex = /\[ACTION:syncProgressTo:([\w-]+)\]/g;
@@ -399,6 +429,8 @@ export function ChatBar() {
   const updatePokemonStore = useRunStore((s) => s.updatePokemon);
   const updateInventory = useRunStore((s) => s.updateInventory);
   const updateMoney = useRunStore((s) => s.updateMoney);
+  const updatePlayTime = useRunStore((s) => s.updatePlayTime);
+  const markPokemonCaught = useRunStore((s) => s.markPokemonCaught);
   const setActiveTab = useUIStore((s) => s.setActiveTab);
 
   const defeatAllTrainersInLocation = useCallback((locationId: string) => {
@@ -506,6 +538,31 @@ export function ChatBar() {
     return true;
   }, [getPokemonByNickname, updatePokemonStore]);
 
+  const evolvePokemon = useCallback((nickname: string, newSpeciesName: string): boolean => {
+    const pokemon = getPokemonByNickname(nickname);
+    if (!pokemon) return false;
+    
+    // Find the new species by name (case-insensitive)
+    const normalizedName = newSpeciesName.toLowerCase().trim();
+    const newSpecies = Object.values(POKEMON_SPECIES).find(
+      s => s.name.toLowerCase() === normalizedName
+    );
+    
+    if (!newSpecies) return false;
+    
+    // Update the Pokemon's speciesId, species name, and types
+    updatePokemonStore(pokemon.id, { 
+      speciesId: newSpecies.id,
+      species: newSpecies.name,
+      types: newSpecies.types,
+    });
+    
+    // Also mark the new species as caught in Pokedex
+    markPokemonCaught(newSpecies.id, pokemon.encounteredAt);
+    
+    return true;
+  }, [getPokemonByNickname, updatePokemonStore, markPokemonCaught]);
+
   const syncProgressTo = useCallback((targetLocationId: string): { locationsVisited: number; trainersDefeated: number } => {
     if (!currentRun) return { locationsVisited: 0, trainersDefeated: 0 };
     
@@ -596,9 +653,11 @@ export function ChatBar() {
     catchPokemon,
     updatePokemon,
     updatePokemonStats,
+    evolvePokemon,
     getPokemonByNickname,
     updateInventory,
     updateMoney,
+    updatePlayTime,
     syncProgressTo,
     unclearLocation,
     undefeatTrainers: undefeatAllTrainers,
@@ -804,8 +863,10 @@ export function ChatBar() {
                                     {action.type === 'navigate' && <Navigation className="w-3 h-3" />}
                                     {action.type === 'catch' && <Circle className="w-3 h-3" />}
                                     {action.type === 'update' && <BarChart3 className="w-3 h-3" />}
+                                    {action.type === 'evolve' && <TrendingUp className="w-3 h-3" />}
                                     {action.type === 'inventory' && <Package className="w-3 h-3" />}
                                     {action.type === 'money' && <Coins className="w-3 h-3" />}
+                                    {action.type === 'playtime' && <Clock className="w-3 h-3" />}
                                     {action.type === 'sync' && <RefreshCw className="w-3 h-3" />}
                                     {action.type === 'unclear' && <Undo2 className="w-3 h-3" />}
                                     <CheckCircle2 className="w-3 h-3" />

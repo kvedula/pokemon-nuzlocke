@@ -557,7 +557,7 @@ export function WalkthroughView() {
           </TabsList>
         </div>
         
-        <TabsContent value="gyms" className="flex-1 overflow-auto px-4 pb-4 mt-0">
+        <TabsContent value="gyms" className="flex-1 overflow-auto px-4 pb-24 mt-0">
           <div className="space-y-3 pt-2">
             {GYM_GUIDES.map((gym) => (
               <GymCard
@@ -571,13 +571,13 @@ export function WalkthroughView() {
           </div>
         </TabsContent>
         
-        <TabsContent value="elite4" className="flex-1 overflow-auto px-4 pb-4 mt-0">
+        <TabsContent value="elite4" className="flex-1 overflow-auto px-4 pb-24 mt-0">
           <div className="pt-2">
             <EliteFourSection />
           </div>
         </TabsContent>
         
-        <TabsContent value="walkthrough" className="flex-1 overflow-auto px-4 pb-4 mt-0">
+        <TabsContent value="walkthrough" className="flex-1 overflow-auto px-4 pb-24 mt-0">
           <div className="pt-2">
             <FullWalkthroughSection />
           </div>

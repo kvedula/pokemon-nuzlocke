@@ -154,7 +154,7 @@ export function RulesView() {
 
       {/* Rules List */}
       <ScrollArea className="flex-1">
-        <div className="p-4">
+        <div className="p-4 pb-24">
           <Accordion defaultValue={['core', 'catch']} className="space-y-4">
             {Object.entries(rulesByCategory).map(([category, rules]) => {
               const categoryInfo = CATEGORY_LABELS[category] || CATEGORY_LABELS.custom;

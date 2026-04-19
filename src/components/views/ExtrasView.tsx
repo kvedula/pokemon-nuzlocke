@@ -117,7 +117,7 @@ export function ExtrasView() {
 
   return (
     <ScrollArea className="h-full">
-      <div className="p-6 space-y-6 max-w-6xl mx-auto">
+      <div className="p-6 pb-24 space-y-6 max-w-6xl mx-auto">
         <div className="flex items-center gap-3 mb-6">
           <Sparkles className="w-6 h-6 text-primary" />
           <h1 className="text-2xl font-bold">Extra Trackers</h1>

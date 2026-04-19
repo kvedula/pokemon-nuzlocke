@@ -142,7 +142,7 @@ export function TimelineView() {
 
       {/* Timeline */}
       <ScrollArea className="flex-1">
-        <div className="p-6">
+        <div className="p-6 pb-24">
           {events.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
               <Clock className="w-12 h-12 mx-auto mb-3 opacity-30" />
