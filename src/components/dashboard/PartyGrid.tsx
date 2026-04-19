@@ -74,13 +74,13 @@ function CompactPokemonCard({ pokemon, index, onMoveToBox, onMarkDead }: Compact
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
         className={cn(
-          'group relative p-4 rounded-xl border bg-gradient-to-b from-card to-card/80',
+          'group relative p-4 pt-5 rounded-xl border bg-gradient-to-b from-card to-card/80',
           'hover:border-primary/50 transition-all duration-200',
           'hover:shadow-lg hover:shadow-primary/10'
         )}
       >
-        {/* Slot badge */}
-        <div className="absolute -top-2 -left-2 w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center shadow-md">
+        {/* Slot badge - positioned inside the card */}
+        <div className="absolute top-1.5 left-1.5 w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center">
           {index + 1}
         </div>
 
@@ -271,7 +271,7 @@ export function PartyGrid() {
               <p className="text-xs mt-1">Catch some Pokémon to get started!</p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
               <AnimatePresence mode="popLayout">
                 {partyPokemon.map((pokemon, index) => (
                   <CompactPokemonCard
