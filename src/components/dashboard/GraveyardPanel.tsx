@@ -89,7 +89,11 @@ function FallenPokemonCard({ pokemon }: FallenPokemonCardProps) {
   );
 }
 
-export function GraveyardPanel() {
+interface GraveyardPanelProps {
+  minimal?: boolean;
+}
+
+export function GraveyardPanel({ minimal = false }: GraveyardPanelProps) {
   const currentRun = useRunStore((s) => s.currentRun);
   const [expanded, setExpanded] = React.useState(true);
 
@@ -102,6 +106,19 @@ export function GraveyardPanel() {
   }, [currentRun]);
 
   if (!currentRun) return null;
+
+  // Minimal mode - just show the list
+  if (minimal) {
+    return (
+      <ScrollArea className="h-[150px]">
+        <div className="space-y-2">
+          {fallenPokemon.map((pokemon) => (
+            <FallenPokemonCard key={pokemon.id} pokemon={pokemon} />
+          ))}
+        </div>
+      </ScrollArea>
+    );
+  }
 
   return (
     <div className="rounded-xl border bg-card overflow-hidden">

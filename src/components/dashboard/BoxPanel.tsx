@@ -108,7 +108,11 @@ function BoxedPokemonCard({ pokemon, onSelect, onMoveToParty, canMoveToParty }: 
   );
 }
 
-export function BoxPanel() {
+interface BoxPanelProps {
+  minimal?: boolean;
+}
+
+export function BoxPanel({ minimal = false }: BoxPanelProps) {
   const currentRun = useRunStore((s) => s.currentRun);
   const movePokemonToParty = useRunStore((s) => s.movePokemonToParty);
   const selectPokemon = useUIStore((s) => s.selectPokemon);
@@ -124,6 +128,27 @@ export function BoxPanel() {
   const canAddToParty = currentRun && currentRun.party.length < 6;
 
   if (!currentRun) return null;
+
+  // Minimal mode - just show the grid
+  if (minimal) {
+    return (
+      <ScrollArea className="h-[150px]">
+        <div className="grid grid-cols-5 gap-2">
+          <AnimatePresence mode="popLayout">
+            {boxedPokemon.map((pokemon) => (
+              <BoxedPokemonCard
+                key={pokemon.id}
+                pokemon={pokemon}
+                onSelect={() => selectPokemon(pokemon.id)}
+                onMoveToParty={() => movePokemonToParty(pokemon.id)}
+                canMoveToParty={!!canAddToParty}
+              />
+            ))}
+          </AnimatePresence>
+        </div>
+      </ScrollArea>
+    );
+  }
 
   return (
     <div className="rounded-xl border bg-card overflow-hidden">

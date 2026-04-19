@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 type Theme = 'light' | 'dark' | 'system';
-type ActiveTab = 'dashboard' | 'map' | 'walkthrough' | 'team' | 'encounters' | 'rules' | 'timeline' | 'pokedex';
+type ActiveTab = 'dashboard' | 'map' | 'walkthrough' | 'team' | 'encounters' | 'extras' | 'rules' | 'timeline' | 'pokedex';
 
 interface UIState {
   theme: Theme;

@@ -15,6 +15,7 @@ import { RulesView } from '@/components/views/RulesView';
 import { TimelineView } from '@/components/views/TimelineView';
 import { PokedexView } from '@/components/views/PokedexView';
 import { WalkthroughView } from '@/components/views/WalkthroughView';
+import { ExtrasView } from '@/components/views/ExtrasView';
 import { ChatBar } from '@/components/chat/ChatBar';
 import { exportRunToJSON, importRunFromJSON, exportAllData } from '@/lib/db';
 import { toast } from 'sonner';
@@ -49,6 +50,7 @@ const VIEWS: Record<string, React.ComponentType> = {
   map: MapView,
   team: TeamView,
   encounters: EncountersView,
+  extras: ExtrasView,
   rules: RulesView,
   timeline: TimelineView,
   pokedex: PokedexView,
