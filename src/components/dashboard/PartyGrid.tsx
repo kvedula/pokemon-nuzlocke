@@ -74,13 +74,13 @@ function CompactPokemonCard({ pokemon, index, onMoveToBox, onMarkDead }: Compact
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
         className={cn(
-          'group relative p-3 rounded-xl border bg-card',
+          'group relative p-4 rounded-xl border bg-gradient-to-b from-card to-card/80',
           'hover:border-primary/50 transition-all duration-200',
-          'hover:shadow-lg hover:shadow-primary/5'
+          'hover:shadow-lg hover:shadow-primary/10'
         )}
       >
         {/* Slot badge */}
-        <div className="absolute -top-1.5 -left-1.5 w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center">
+        <div className="absolute -top-2 -left-2 w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center shadow-md">
           {index + 1}
         </div>
 
@@ -91,9 +91,9 @@ function CompactPokemonCard({ pokemon, index, onMoveToBox, onMarkDead }: Compact
               <Button
                 variant="ghost"
                 size="icon"
-                className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6"
+                className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity h-7 w-7"
               >
-                <MoreHorizontal className="h-3 w-3" />
+                <MoreHorizontal className="h-4 w-4" />
               </Button>
             }
           />
@@ -114,36 +114,36 @@ function CompactPokemonCard({ pokemon, index, onMoveToBox, onMarkDead }: Compact
         </DropdownMenu>
 
         {/* Sprite */}
-        <div className="relative w-12 h-12 mx-auto mb-2">
-          <div className="w-12 h-12 bg-muted rounded-lg flex items-center justify-center overflow-hidden">
+        <div className="relative w-16 h-16 mx-auto mb-3">
+          <div className="w-16 h-16 bg-muted/50 rounded-xl flex items-center justify-center overflow-hidden">
             {species ? (
               <img
                 src={pokemon.isShiny ? species.spriteShinyUrl : species.spriteUrl}
                 alt={pokemon.species}
-                className="w-10 h-10 pixelated"
+                className="w-14 h-14 pixelated"
                 loading="lazy"
               />
             ) : (
-              <div className="w-8 h-8 bg-muted-foreground/20 rounded-full" />
+              <div className="w-10 h-10 bg-muted-foreground/20 rounded-full" />
             )}
           </div>
           {pokemon.isShiny && (
-            <Sparkles className="absolute -top-1 -right-1 w-3 h-3 text-yellow-400" />
+            <Sparkles className="absolute -top-1 -right-1 w-4 h-4 text-yellow-400" />
           )}
         </div>
 
         {/* Name & Level */}
-        <div className="text-center mb-2">
-          <p className="font-semibold text-sm truncate">{pokemon.nickname}</p>
-          <p className="text-[10px] text-muted-foreground">Lv.{pokemon.level}</p>
+        <div className="text-center mb-3">
+          <p className="font-bold text-sm truncate">{pokemon.nickname}</p>
+          <p className="text-xs text-muted-foreground">Lv.{pokemon.level}</p>
         </div>
 
         {/* Types */}
-        <div className="flex justify-center gap-1 mb-2">
+        <div className="flex justify-center gap-1.5 mb-3">
           {pokemon.types.map((type) => (
             <span
               key={type}
-              className="px-1.5 py-0.5 rounded text-[9px] font-medium text-white"
+              className="px-2 py-0.5 rounded-md text-[10px] font-semibold text-white shadow-sm"
               style={{ backgroundColor: TYPE_COLORS[type] }}
             >
               {type}
@@ -152,30 +152,30 @@ function CompactPokemonCard({ pokemon, index, onMoveToBox, onMarkDead }: Compact
         </div>
 
         {/* HP Bar */}
-        <div className="space-y-0.5">
-          <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+        <div className="mb-3">
+          <div className="h-2 bg-muted rounded-full overflow-hidden">
             <div
               className={cn('h-full transition-all duration-300', hpColor)}
               style={{ width: `${hpPercent}%` }}
             />
           </div>
-          <p className="text-[9px] text-center text-muted-foreground">
+          <p className="text-[10px] text-center text-muted-foreground mt-1">
             {pokemon.currentHp}/{pokemon.maxHp}
           </p>
         </div>
 
         {/* Quick Stats */}
-        <div className="flex items-center justify-center gap-2 mt-2 text-[9px] text-muted-foreground">
-          <span className="flex items-center gap-0.5">
-            <Swords className="w-2.5 h-2.5" />
+        <div className="flex items-center justify-between px-1 text-[10px] text-muted-foreground border-t pt-2">
+          <span className="flex items-center gap-1">
+            <Swords className="w-3 h-3 text-red-400" />
             {pokemon.stats.attack}
           </span>
-          <span className="flex items-center gap-0.5">
-            <Shield className="w-2.5 h-2.5" />
+          <span className="flex items-center gap-1">
+            <Shield className="w-3 h-3 text-blue-400" />
             {pokemon.stats.defense}
           </span>
-          <span className="flex items-center gap-0.5">
-            <Zap className="w-2.5 h-2.5" />
+          <span className="flex items-center gap-1">
+            <Zap className="w-3 h-3 text-yellow-400" />
             {pokemon.stats.speed}
           </span>
         </div>
@@ -247,32 +247,31 @@ export function PartyGrid() {
   return (
     <Collapsible open={expanded} onOpenChange={setExpanded}>
       <div className="p-4 rounded-xl border bg-card">
-        <CollapsibleTrigger asChild>
-          <button className="w-full flex items-center justify-between mb-3 hover:opacity-80 transition-opacity">
-            <div className="flex items-center gap-2">
-              <Swords className="w-5 h-5 text-primary" />
-              <h3 className="font-semibold">Your Team</h3>
-              <Badge variant="secondary">{partyPokemon.length}/6</Badge>
-              {avgLevel > 0 && (
-                <span className="text-xs text-muted-foreground">Avg Lv.{avgLevel}</span>
-              )}
-            </div>
-            {expanded ? (
-              <ChevronUp className="w-4 h-4 text-muted-foreground" />
-            ) : (
-              <ChevronDown className="w-4 h-4 text-muted-foreground" />
+        <CollapsibleTrigger className="w-full flex items-center justify-between mb-3 hover:opacity-80 transition-opacity">
+          <div className="flex items-center gap-2">
+            <Swords className="w-5 h-5 text-primary" />
+            <h3 className="font-semibold">Your Team</h3>
+            <Badge variant="secondary">{partyPokemon.length}/6</Badge>
+            {avgLevel > 0 && (
+              <span className="text-xs text-muted-foreground">Avg Lv.{avgLevel}</span>
             )}
-          </button>
+          </div>
+          {expanded ? (
+            <ChevronUp className="w-4 h-4 text-muted-foreground" />
+          ) : (
+            <ChevronDown className="w-4 h-4 text-muted-foreground" />
+          )}
         </CollapsibleTrigger>
 
         <CollapsibleContent>
           {partyPokemon.length === 0 ? (
-            <div className="text-center py-6 text-muted-foreground border-2 border-dashed rounded-lg">
-              <Swords className="w-8 h-8 mx-auto mb-2 opacity-30" />
+            <div className="text-center py-8 text-muted-foreground border-2 border-dashed rounded-xl">
+              <Swords className="w-10 h-10 mx-auto mb-2 opacity-30" />
               <p className="text-sm">Your party is empty</p>
+              <p className="text-xs mt-1">Catch some Pokémon to get started!</p>
             </div>
           ) : (
-            <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
               <AnimatePresence mode="popLayout">
                 {partyPokemon.map((pokemon, index) => (
                   <CompactPokemonCard
@@ -285,13 +284,16 @@ export function PartyGrid() {
                 ))}
               </AnimatePresence>
               
-              {/* Empty slots */}
+              {/* Empty slots - more subtle */}
               {Array.from({ length: 6 - partyPokemon.length }).map((_, i) => (
                 <div
                   key={`empty-${i}`}
-                  className="p-3 rounded-xl border-2 border-dashed border-muted flex items-center justify-center min-h-[140px]"
+                  className="rounded-xl border border-dashed border-muted-foreground/20 bg-muted/20 flex flex-col items-center justify-center min-h-[200px]"
                 >
-                  <span className="text-xs text-muted-foreground">Empty</span>
+                  <div className="w-12 h-12 rounded-full border-2 border-dashed border-muted-foreground/20 flex items-center justify-center mb-2">
+                    <span className="text-lg text-muted-foreground/30">+</span>
+                  </div>
+                  <span className="text-[10px] text-muted-foreground/50">Empty Slot</span>
                 </div>
               ))}
             </div>

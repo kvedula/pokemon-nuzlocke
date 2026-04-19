@@ -12,7 +12,6 @@ import { NextSteps } from '@/components/dashboard/NextSteps';
 import { BagPanel } from '@/components/dashboard/BagPanel';
 import { BoxPanel } from '@/components/dashboard/BoxPanel';
 import { GraveyardPanel } from '@/components/dashboard/GraveyardPanel';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -75,13 +74,13 @@ export function DashboardView() {
   return (
     <div className="h-full flex flex-col overflow-hidden">
       {/* Top Progress Bar */}
-      <div className="shrink-0 p-4 pb-0">
+      <div className="shrink-0 p-4 pb-2">
         <ProgressBar />
       </div>
 
-      {/* Main Content */}
-      <ScrollArea className="flex-1">
-        <div className="p-4 space-y-4">
+      {/* Main Content - Scrollable */}
+      <div className="flex-1 overflow-y-auto min-h-0">
+        <div className="p-4 pt-2 space-y-6">
           {/* Row 1: Team + Next Steps side by side */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             {/* Team - Takes 2 columns */}
@@ -171,15 +170,13 @@ export function DashboardView() {
             {/* PC Box */}
             <Collapsible open={boxExpanded} onOpenChange={setBoxExpanded}>
               <div className="rounded-xl border bg-card overflow-hidden">
-                <CollapsibleTrigger asChild>
-                  <button className="w-full p-4 flex items-center justify-between hover:bg-muted/50 transition-colors">
-                    <div className="flex items-center gap-2">
-                      <span className="text-lg">📦</span>
-                      <span className="font-semibold">PC Box</span>
-                      <Badge variant="secondary">{boxCount}</Badge>
-                    </div>
-                    <ChevronRight className={`w-4 h-4 transition-transform ${boxExpanded ? 'rotate-90' : ''}`} />
-                  </button>
+                <CollapsibleTrigger className="w-full p-4 flex items-center justify-between hover:bg-muted/50 transition-colors">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">📦</span>
+                    <span className="font-semibold">PC Box</span>
+                    <Badge variant="secondary">{boxCount}</Badge>
+                  </div>
+                  <ChevronRight className={`w-4 h-4 transition-transform ${boxExpanded ? 'rotate-90' : ''}`} />
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                   <div className="px-4 pb-4">
@@ -198,17 +195,15 @@ export function DashboardView() {
             {/* Graveyard */}
             <Collapsible open={graveyardExpanded} onOpenChange={setGraveyardExpanded}>
               <div className="rounded-xl border bg-card overflow-hidden">
-                <CollapsibleTrigger asChild>
-                  <button className="w-full p-4 flex items-center justify-between hover:bg-muted/50 transition-colors">
-                    <div className="flex items-center gap-2">
-                      <span className="text-lg">💀</span>
-                      <span className="font-semibold">Graveyard</span>
-                      <Badge variant={graveyardCount > 0 ? 'destructive' : 'secondary'}>
-                        {graveyardCount}
-                      </Badge>
-                    </div>
-                    <ChevronRight className={`w-4 h-4 transition-transform ${graveyardExpanded ? 'rotate-90' : ''}`} />
-                  </button>
+                <CollapsibleTrigger className="w-full p-4 flex items-center justify-between hover:bg-muted/50 transition-colors">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">💀</span>
+                    <span className="font-semibold">Graveyard</span>
+                    <Badge variant={graveyardCount > 0 ? 'destructive' : 'secondary'}>
+                      {graveyardCount}
+                    </Badge>
+                  </div>
+                  <ChevronRight className={`w-4 h-4 transition-transform ${graveyardExpanded ? 'rotate-90' : ''}`} />
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                   <div className="px-4 pb-4">
@@ -225,7 +220,7 @@ export function DashboardView() {
             </Collapsible>
           </div>
         </div>
-      </ScrollArea>
+      </div>
     </div>
   );
 }
