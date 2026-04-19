@@ -72,80 +72,95 @@ export function Sidebar({ onNewRun, onExport, onImport, onOpenRuns }: SidebarPro
             render={
               <button 
                 onClick={onOpenRuns}
-                className="p-4 flex items-center gap-3 hover:bg-muted/50 transition-colors w-full text-left"
+                className="p-4 flex items-center gap-3 hover:bg-muted/50 transition-all w-full text-left group"
               >
-                {/* Pixelated Master Ball */}
-                <div className="w-10 h-10 flex-shrink-0 relative">
-                  <svg viewBox="0 0 16 16" className="w-full h-full" style={{ imageRendering: 'pixelated' }}>
-                    {/* Top half - purple */}
-                    <rect x="5" y="0" width="6" height="1" fill="#9b4dca"/>
-                    <rect x="3" y="1" width="2" height="1" fill="#9b4dca"/>
-                    <rect x="5" y="1" width="6" height="1" fill="#d896ff"/>
-                    <rect x="11" y="1" width="2" height="1" fill="#9b4dca"/>
-                    <rect x="2" y="2" width="1" height="1" fill="#9b4dca"/>
-                    <rect x="3" y="2" width="2" height="1" fill="#d896ff"/>
-                    <rect x="5" y="2" width="6" height="1" fill="#e8c4ff"/>
-                    <rect x="11" y="2" width="2" height="1" fill="#d896ff"/>
-                    <rect x="13" y="2" width="1" height="1" fill="#9b4dca"/>
-                    <rect x="1" y="3" width="1" height="1" fill="#9b4dca"/>
-                    <rect x="2" y="3" width="1" height="1" fill="#d896ff"/>
-                    <rect x="3" y="3" width="10" height="1" fill="#e8c4ff"/>
-                    <rect x="13" y="3" width="1" height="1" fill="#d896ff"/>
-                    <rect x="14" y="3" width="1" height="1" fill="#9b4dca"/>
-                    <rect x="1" y="4" width="1" height="1" fill="#9b4dca"/>
-                    <rect x="2" y="4" width="12" height="1" fill="#d896ff"/>
-                    <rect x="14" y="4" width="1" height="1" fill="#9b4dca"/>
-                    <rect x="0" y="5" width="1" height="1" fill="#9b4dca"/>
-                    <rect x="1" y="5" width="14" height="1" fill="#d896ff"/>
-                    <rect x="15" y="5" width="1" height="1" fill="#9b4dca"/>
-                    <rect x="0" y="6" width="1" height="1" fill="#9b4dca"/>
-                    <rect x="1" y="6" width="14" height="1" fill="#d896ff"/>
-                    <rect x="15" y="6" width="1" height="1" fill="#9b4dca"/>
-                    {/* Center band - black with white circle */}
-                    <rect x="0" y="7" width="5" height="2" fill="#1a1a1a"/>
-                    <rect x="5" y="7" width="1" height="1" fill="#333"/>
-                    <rect x="6" y="6" width="1" height="1" fill="#333"/>
-                    <rect x="6" y="7" width="4" height="2" fill="#fff"/>
-                    <rect x="7" y="6" width="2" height="1" fill="#fff"/>
-                    <rect x="7" y="9" width="2" height="1" fill="#fff"/>
-                    <rect x="10" y="7" width="1" height="1" fill="#333"/>
-                    <rect x="9" y="6" width="1" height="1" fill="#333"/>
-                    <rect x="11" y="7" width="5" height="2" fill="#1a1a1a"/>
-                    {/* Bottom half - white */}
-                    <rect x="0" y="9" width="1" height="1" fill="#ccc"/>
-                    <rect x="1" y="9" width="14" height="1" fill="#f0f0f0"/>
-                    <rect x="15" y="9" width="1" height="1" fill="#ccc"/>
-                    <rect x="0" y="10" width="1" height="1" fill="#ccc"/>
-                    <rect x="1" y="10" width="14" height="1" fill="#fff"/>
-                    <rect x="15" y="10" width="1" height="1" fill="#ccc"/>
-                    <rect x="1" y="11" width="1" height="1" fill="#ccc"/>
-                    <rect x="2" y="11" width="12" height="1" fill="#fff"/>
-                    <rect x="14" y="11" width="1" height="1" fill="#ccc"/>
-                    <rect x="1" y="12" width="1" height="1" fill="#ccc"/>
-                    <rect x="2" y="12" width="1" height="1" fill="#f0f0f0"/>
-                    <rect x="3" y="12" width="10" height="1" fill="#fff"/>
-                    <rect x="13" y="12" width="1" height="1" fill="#f0f0f0"/>
-                    <rect x="14" y="12" width="1" height="1" fill="#ccc"/>
-                    <rect x="2" y="13" width="1" height="1" fill="#ccc"/>
-                    <rect x="3" y="13" width="2" height="1" fill="#f0f0f0"/>
-                    <rect x="5" y="13" width="6" height="1" fill="#fff"/>
-                    <rect x="11" y="13" width="2" height="1" fill="#f0f0f0"/>
-                    <rect x="13" y="13" width="1" height="1" fill="#ccc"/>
-                    <rect x="3" y="14" width="2" height="1" fill="#ccc"/>
-                    <rect x="5" y="14" width="6" height="1" fill="#f0f0f0"/>
-                    <rect x="11" y="14" width="2" height="1" fill="#ccc"/>
-                    <rect x="5" y="15" width="6" height="1" fill="#ccc"/>
+                {/* Animated Pokeball */}
+                <motion.div 
+                  className="w-11 h-11 flex-shrink-0 relative"
+                  whileHover={{ scale: 1.1, rotate: 360 }}
+                  transition={{ type: 'spring', stiffness: 260, damping: 20 }}
+                >
+                  {/* Glow effect */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-purple-500/30 to-pink-500/30 rounded-full blur-lg group-hover:blur-xl transition-all opacity-60 group-hover:opacity-100" />
+                  
+                  {/* Pokeball SVG */}
+                  <svg viewBox="0 0 100 100" className="w-full h-full relative z-10 drop-shadow-lg">
+                    <defs>
+                      <linearGradient id="topGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stopColor="#c084fc" />
+                        <stop offset="100%" stopColor="#9333ea" />
+                      </linearGradient>
+                      <linearGradient id="bottomGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stopColor="#f5f5f5" />
+                        <stop offset="100%" stopColor="#e5e5e5" />
+                      </linearGradient>
+                      <filter id="innerShadow">
+                        <feOffset dx="0" dy="2"/>
+                        <feGaussianBlur stdDeviation="2" result="offset-blur"/>
+                        <feComposite operator="out" in="SourceGraphic" in2="offset-blur" result="inverse"/>
+                        <feFlood floodColor="black" floodOpacity="0.2" result="color"/>
+                        <feComposite operator="in" in="color" in2="inverse" result="shadow"/>
+                        <feComposite operator="over" in="shadow" in2="SourceGraphic"/>
+                      </filter>
+                    </defs>
+                    
+                    {/* Ball outline */}
+                    <circle cx="50" cy="50" r="47" fill="none" stroke="#1f1f1f" strokeWidth="3"/>
+                    
+                    {/* Top half - purple gradient */}
+                    <path d="M 50 3 A 47 47 0 0 1 97 50 L 3 50 A 47 47 0 0 1 50 3" fill="url(#topGradient)" filter="url(#innerShadow)"/>
+                    
+                    {/* Shine on top */}
+                    <ellipse cx="35" cy="25" rx="15" ry="8" fill="rgba(255,255,255,0.3)" transform="rotate(-30 35 25)"/>
+                    
+                    {/* Bottom half - white gradient */}
+                    <path d="M 50 97 A 47 47 0 0 1 3 50 L 97 50 A 47 47 0 0 1 50 97" fill="url(#bottomGradient)" filter="url(#innerShadow)"/>
+                    
+                    {/* Center band */}
+                    <rect x="3" y="45" width="94" height="10" fill="#1f1f1f"/>
+                    
+                    {/* Center button outer */}
+                    <circle cx="50" cy="50" r="16" fill="#1f1f1f"/>
+                    <circle cx="50" cy="50" r="12" fill="#f5f5f5"/>
+                    
+                    {/* Center button inner with pulse */}
+                    <motion.circle 
+                      cx="50" 
+                      cy="50" 
+                      r="7" 
+                      fill="#f5f5f5"
+                      stroke="#1f1f1f"
+                      strokeWidth="2"
+                      animate={{ 
+                        boxShadow: ['0 0 0 0 rgba(168, 85, 247, 0)', '0 0 0 4px rgba(168, 85, 247, 0.4)', '0 0 0 0 rgba(168, 85, 247, 0)']
+                      }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    />
+                    
+                    {/* Button highlight */}
+                    <circle cx="47" cy="47" r="3" fill="rgba(255,255,255,0.6)"/>
                   </svg>
-                </div>
+                </motion.div>
+                
                 {sidebarOpen && (
                   <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -10 }}
+                    className="overflow-hidden"
                   >
-                    <h1 className="font-bold text-lg">Nuzlocke</h1>
-                    <p className="text-xs text-muted-foreground">
-                      {currentRun ? currentRun.name : 'Click to view runs'}
+                    <h1 className="font-extrabold text-xl bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient">
+                      Nuzlocke
+                    </h1>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {currentRun ? (
+                        <span className="flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                          {currentRun.name}
+                        </span>
+                      ) : (
+                        'Click to view runs'
+                      )}
                     </p>
                   </motion.div>
                 )}
