@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUIStore } from '@/store/uiStore';
 import { useRunStore } from '@/store/runStore';
+import { useSettingsStore } from '@/store/settingsStore';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { NewRunDialog } from '@/components/layout/NewRunDialog';
 import { RunsDialog } from '@/components/layout/RunsDialog';
@@ -17,6 +18,9 @@ import { PokedexView } from '@/components/views/PokedexView';
 import { WalkthroughView } from '@/components/views/WalkthroughView';
 import { ExtrasView } from '@/components/views/ExtrasView';
 import { ChatBar } from '@/components/chat/ChatBar';
+import { MilestoneProvider } from '@/components/ui/milestone-toast';
+import { SettingsPanel } from '@/components/settings/SettingsPanel';
+import { ExportShare } from '@/components/tools/ExportShare';
 import { exportRunToJSON, importRunFromJSON, exportAllData } from '@/lib/db';
 import { toast } from 'sonner';
 import { 
@@ -43,6 +47,8 @@ import {
   Plus,
   PanelLeftOpen,
   Sparkles,
+  Settings,
+  Share2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -62,9 +68,12 @@ export function App() {
   const { activeTab, setActiveTab, commandPaletteOpen, toggleCommandPalette, theme, setTheme, sidebarOpen, setSidebarOpen } = useUIStore();
   const currentRun = useRunStore((s) => s.currentRun);
   const loadRun = useRunStore((s) => s.loadRun);
+  const { settings } = useSettingsStore();
   
   const [newRunDialogOpen, setNewRunDialogOpen] = useState(false);
   const [runsDialogOpen, setRunsDialogOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
 
   const handleExport = useCallback(async () => {
     if (!currentRun) {
@@ -241,7 +250,18 @@ export function App() {
             </CommandItem>
           </CommandGroup>
           <CommandSeparator />
+          <CommandGroup heading="Tools">
+            <CommandItem onSelect={() => { setShareOpen(true); toggleCommandPalette(); }}>
+              <Share2 className="mr-2 h-4 w-4" />
+              Export & Share
+            </CommandItem>
+          </CommandGroup>
+          <CommandSeparator />
           <CommandGroup heading="Settings">
+            <CommandItem onSelect={() => { setSettingsOpen(true); toggleCommandPalette(); }}>
+              <Settings className="mr-2 h-4 w-4" />
+              Settings
+            </CommandItem>
             <CommandItem onSelect={() => { setTheme(theme === 'dark' ? 'light' : 'dark'); toggleCommandPalette(); }}>
               {theme === 'dark' ? (
                 <>
@@ -259,8 +279,25 @@ export function App() {
         </CommandList>
       </CommandDialog>
 
+      {/* Settings Panel */}
+      <SettingsPanel open={settingsOpen} onOpenChange={setSettingsOpen} />
+      
+      {/* Export & Share */}
+      <ExportShare open={shareOpen} onOpenChange={setShareOpen} />
+
       {/* AI Chat Assistant */}
       <ChatBar />
     </div>
+  );
+}
+
+// Wrap App with providers
+export function AppWithProviders() {
+  const { settings } = useSettingsStore();
+  
+  return (
+    <MilestoneProvider enabled={settings.milestonesEnabled}>
+      <App />
+    </MilestoneProvider>
   );
 }

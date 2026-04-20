@@ -9,6 +9,7 @@ import { PartyGrid } from '@/components/dashboard/PartyGrid';
 import { TypeCoverage } from '@/components/dashboard/TypeCoverage';
 import { RecentActivity } from '@/components/dashboard/RecentActivity';
 import { NextSteps } from '@/components/dashboard/NextSteps';
+import { BattlePrep } from '@/components/dashboard/BattlePrep';
 import { BagPanel } from '@/components/dashboard/BagPanel';
 import { BoxPanel } from '@/components/dashboard/BoxPanel';
 import { GraveyardPanel } from '@/components/dashboard/GraveyardPanel';
@@ -88,10 +89,10 @@ export function DashboardView() {
               <PartyGrid />
             </div>
 
-            {/* Right Column - Next Up & Coverage */}
+            {/* Right Column - Battle Prep & Coverage */}
             <div className="space-y-4">
-              {/* Next Gym Quick Preview */}
-              <NextStepsCompact />
+              {/* Battle Prep */}
+              <BattlePrep />
               
               {/* Type Coverage */}
               <TypeCoverage compact />
