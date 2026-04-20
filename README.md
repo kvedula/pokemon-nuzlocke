@@ -11,12 +11,17 @@ A premium, offline-capable local app for tracking your Pokémon FireRed/LeafGree
 
 ### 🎮 Run Dashboard
 - **Party Management**: View your current team with sprites, levels, HP/status, moves, held items, nature, ability, and detailed stats
+- **Select & Swap**: Easily reorder your party by selecting two Pokémon to swap positions
+- **Moves Editing**: Add and edit up to 4 moves per Pokémon with type indicators
 - **Box System**: Manage boxed Pokémon with easy access to move them to your party
 - **Graveyard**: Honor your fallen companions with a dedicated memorial
 - **Badge Tracker**: Visual 8-badge progression with click-to-obtain functionality
+- **Battle Prep**: See upcoming gym leader teams, type matchups, and strategy tips
+- **Type Coverage**: Analyze your team's offensive coverage and defensive weaknesses
+- **Playtime Timer**: Start/pause timer to automatically track your play time
 - **Run Statistics**: Real-time stats including encounters, deaths, play time, and HM progress
 - **Bag & Inventory**: Track your items, money, and key items
-- **Next Steps**: AI-powered recommendations for what to do next based on your progress
+- **Recent Activity**: Timeline of recent catches, deaths, and badges
 
 ### 🗺️ Interactive Kanto Map
 - **Full Kanto Region**: All routes, towns, caves, gyms, and special locations (60+ locations)
@@ -67,13 +72,38 @@ A premium, offline-capable local app for tracking your Pokémon FireRed/LeafGree
 - **Event History**: Chronological log of catches, deaths, badges, and milestones
 - **Visual Timeline**: Beautiful timeline with event-specific icons and colors
 
+### 🧰 Extra Tools (Extras Tab)
+- **Type Coverage Analysis**: Deep dive into your team's offensive and defensive coverage
+- **Evolution Tracker**: See which Pokémon are ready to evolve and what they need
+- **Nickname Generator**: Get creative nickname suggestions by theme (mythology, food, puns, etc.)
+- **Encounter Odds**: View catch rates and wild encounter percentages
+- **Dupes Clause Helper**: Track which species you've already caught
+- **Run Statistics**: Comprehensive stats dashboard with survival rate, averages, and more
+
+### 📤 Export & Share
+- **Image Export**: Generate beautiful summary cards of your run with:
+  - High-quality 3x resolution
+  - Team sprites with type badges
+  - Stats overview (badges, alive, fallen, time)
+  - Custom gradient design with glowing effects
+- **Text Summary**: Copy a formatted text summary for sharing
+- **JSON Export**: Full run data backup
+
+### ⚙️ Settings Panel
+- **Theme Toggle**: Switch between dark and light modes
+- **Level Cap Warnings**: Get alerts when Pokémon approach gym leader caps
+- **Sound Effects**: Optional audio feedback (volume adjustable)
+- **Milestone Celebrations**: Toast notifications for achievements
+- **Keyboard Shortcuts**: View all available shortcuts
+
 ### ✨ Additional Features
-- **Dark Mode**: Full dark theme with modern UI
+- **Dark/Light Mode**: Full theme support with system preference detection
 - **Command Palette**: Quick access to all features with `Cmd/Ctrl + K`
+- **Sidebar Shortcuts**: Quick access to Settings and Share from sidebar
 - **Import/Export**: Save and share your runs as JSON files
 - **Offline Support**: Works fully offline after initial load (PWA)
 - **Auto-Save**: Automatic persistence to IndexedDB
-- **Drag & Drop**: Reorder your party with drag and drop
+- **Animated UI**: Smooth animations with Framer Motion
 
 ---
 
@@ -216,24 +246,30 @@ src/
 │   └── page.tsx            # Main page
 ├── components/
 │   ├── chat/               # AI chat assistant
-│   ├── dashboard/          # Dashboard panels (party, box, stats)
+│   ├── dashboard/          # Dashboard panels (party, box, stats, battle prep)
 │   ├── layout/             # Sidebar, dialogs
 │   ├── map/                # Kanto map components
 │   ├── providers/          # React providers
+│   ├── settings/           # Settings panel
+│   ├── tools/              # Export/share, nickname generator
 │   ├── ui/                 # shadcn/ui components
-│   └── views/              # Main view components
+│   └── views/              # Main view components (dashboard, team, extras, etc.)
 ├── data/
 │   ├── locations.ts        # 60+ Kanto locations with encounters
-│   ├── pokemon.ts          # All 151 Gen 1 Pokémon
+│   ├── pokemon.ts          # All 151 Gen 1 Pokémon with type effectiveness
+│   ├── moves.ts            # Gen 1 moves database
+│   ├── gymLeaders.ts       # Gym leaders, Elite Four, Champion data
 │   ├── badges.ts           # Gym badges
 │   ├── walkthrough.ts      # Step-by-step guide
 │   └── rules.ts            # Nuzlocke rule presets
 ├── lib/
 │   ├── db.ts               # IndexedDB utilities
+│   ├── sounds.ts           # Sound effects manager
 │   └── utils.ts            # Helper functions
 ├── store/
 │   ├── runStore.ts         # Main game state
-│   └── uiStore.ts          # UI state
+│   ├── uiStore.ts          # UI state
+│   └── settingsStore.ts    # User preferences
 └── types/                  # TypeScript definitions
 ```
 
@@ -262,9 +298,12 @@ src/
 All Pokémon data, encounter tables, and location information is pre-seeded for FireRed/LeafGreen:
 
 - ✅ All 151 Gen 1 Pokémon with sprites, types, stats, and abilities
+- ✅ Complete Gen 1 moves database (~165 moves) with type, power, accuracy, PP
 - ✅ Complete Kanto map with 60+ locations
-- ✅ Accurate encounter tables per location
-- ✅ All gym leaders and important trainers with full teams
+- ✅ Accurate encounter tables per location with catch rates
+- ✅ All 8 Gym Leaders with full teams, movesets, and strategies
+- ✅ Elite Four and Champion data with level caps
+- ✅ Type effectiveness charts for battle planning
 - ✅ Item locations and HM requirements
 - ✅ Default Nuzlocke rulesets
 
