@@ -18,7 +18,6 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
-import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import {
   Select,
@@ -108,13 +107,14 @@ export function SettingsPanel({ open, onOpenChange }: SettingsPanelProps) {
                 <Label className="text-xs text-muted-foreground">
                   Warn when within {settings.levelCapWarningThreshold} levels of cap
                 </Label>
-                <Slider
-                  value={[settings.levelCapWarningThreshold]}
-                  onValueChange={([v]) => updateSettings({ levelCapWarningThreshold: v })}
+                <input
+                  type="range"
+                  value={settings.levelCapWarningThreshold}
+                  onChange={(e) => updateSettings({ levelCapWarningThreshold: parseInt(e.target.value) })}
                   min={0}
                   max={5}
                   step={1}
-                  className="w-full"
+                  className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
                 />
               </div>
             )}
@@ -137,13 +137,14 @@ export function SettingsPanel({ open, onOpenChange }: SettingsPanelProps) {
                 <Label className="text-xs text-muted-foreground">
                   Volume: {settings.soundVolume}%
                 </Label>
-                <Slider
-                  value={[settings.soundVolume]}
-                  onValueChange={([v]) => updateSettings({ soundVolume: v })}
+                <input
+                  type="range"
+                  value={settings.soundVolume}
+                  onChange={(e) => updateSettings({ soundVolume: parseInt(e.target.value) })}
                   min={0}
                   max={100}
                   step={5}
-                  className="w-full"
+                  className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
                 />
               </div>
             )}

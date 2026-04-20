@@ -24,6 +24,7 @@ import {
   Upload,
   Moon,
   Sun,
+  Share2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -50,9 +51,11 @@ interface SidebarProps {
   onExport: () => void;
   onImport: () => void;
   onOpenRuns: () => void;
+  onSettings?: () => void;
+  onShare?: () => void;
 }
 
-export function Sidebar({ onNewRun, onExport, onImport, onOpenRuns }: SidebarProps) {
+export function Sidebar({ onNewRun, onExport, onImport, onOpenRuns, onSettings, onShare }: SidebarProps) {
   const { sidebarOpen, toggleSidebar, activeTab, setActiveTab, theme, setTheme } = useUIStore();
   const currentRun = useRunStore((s) => s.currentRun);
 
@@ -284,6 +287,56 @@ export function Sidebar({ onNewRun, onExport, onImport, onOpenRuns }: SidebarPro
             <TooltipContent side="right">Import Run</TooltipContent>
           )}
         </Tooltip>
+
+        {onShare && (
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <button
+                  onClick={onShare}
+                  disabled={!currentRun}
+                  className={cn(
+                    'w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm',
+                    'hover:bg-muted text-muted-foreground hover:text-foreground',
+                    'transition-colors duration-200',
+                    !currentRun && 'opacity-50 cursor-not-allowed',
+                    !sidebarOpen && 'justify-center px-0'
+                  )}
+                >
+                  <Share2 className="w-4 h-4 flex-shrink-0" />
+                  {sidebarOpen && <span>Share</span>}
+                </button>
+              }
+            />
+            {!sidebarOpen && (
+              <TooltipContent side="right">Export & Share</TooltipContent>
+            )}
+          </Tooltip>
+        )}
+
+        {onSettings && (
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <button
+                  onClick={onSettings}
+                  className={cn(
+                    'w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm',
+                    'hover:bg-muted text-muted-foreground hover:text-foreground',
+                    'transition-colors duration-200',
+                    !sidebarOpen && 'justify-center px-0'
+                  )}
+                >
+                  <Settings className="w-4 h-4 flex-shrink-0" />
+                  {sidebarOpen && <span>Settings</span>}
+                </button>
+              }
+            />
+            {!sidebarOpen && (
+              <TooltipContent side="right">Settings</TooltipContent>
+            )}
+          </Tooltip>
+        )}
 
         <Tooltip>
           <TooltipTrigger

@@ -139,6 +139,8 @@ export function App() {
         onExport={handleExport}
         onImport={handleImport}
         onOpenRuns={() => setRunsDialogOpen(true)}
+        onSettings={() => setSettingsOpen(true)}
+        onShare={() => setShareOpen(true)}
       />
 
       <main className="flex-1 overflow-hidden relative">

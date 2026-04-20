@@ -6,6 +6,7 @@ import { useRunStore } from '@/store/runStore';
 import { useUIStore } from '@/store/uiStore';
 import { Pokemon, Nature, PokemonStats } from '@/types';
 import { POKEMON_SPECIES, TYPE_COLORS } from '@/data/pokemon';
+import { MOVES, MOVE_NAMES } from '@/data/moves';
 import { cn } from '@/lib/utils';
 import {
   Users,
@@ -107,6 +108,7 @@ interface EditFormState {
     speed: string;
   };
   notes: string;
+  moves: string[];
 }
 
 interface PokemonHeroCardProps {
@@ -159,6 +161,7 @@ function PokemonHeroCard({ pokemon, index, isParty = false }: PokemonHeroCardPro
           speed: pokemon.stats.speed.toString(),
         },
         notes: pokemon.notes,
+        moves: pokemon.moves?.map(m => m.name) || [],
       });
     }
   }, [isEditing, pokemon]);
@@ -168,6 +171,22 @@ function PokemonHeroCard({ pokemon, index, isParty = false }: PokemonHeroCardPro
     
     const newSpecies = POKEMON_SPECIES[editForm.speciesId];
     const speciesChanged = editForm.speciesId !== pokemon.speciesId;
+    
+    // Convert move names to PokemonMove objects
+    const moves = editForm.moves
+      .filter(name => name && MOVES[name])
+      .map(name => {
+        const moveData = MOVES[name];
+        return {
+          name: moveData.name,
+          type: moveData.type,
+          category: moveData.category,
+          power: moveData.power,
+          accuracy: moveData.accuracy,
+          pp: moveData.pp,
+          currentPp: moveData.pp,
+        };
+      });
     
     updatePokemon(pokemon.id, {
       nickname: editForm.nickname || pokemon.species,
@@ -193,6 +212,7 @@ function PokemonHeroCard({ pokemon, index, isParty = false }: PokemonHeroCardPro
         speed: parseInt(editForm.stats.speed) || pokemon.stats.speed,
       },
       notes: editForm.notes,
+      moves,
     });
     setIsEditing(false);
     setEditForm(null);
@@ -675,6 +695,45 @@ function PokemonHeroCard({ pokemon, index, isParty = false }: PokemonHeroCardPro
                       </div>
                     </div>
 
+                    {/* Moves */}
+                    <div>
+                      <label className="text-xs text-muted-foreground mb-1 block">Moves</label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {[0, 1, 2, 3].map((i) => (
+                          <Select
+                            key={i}
+                            value={editForm.moves[i] || ''}
+                            onValueChange={(v) => {
+                              const newMoves = [...editForm.moves];
+                              newMoves[i] = v || '';
+                              setEditForm({ ...editForm, moves: newMoves });
+                            }}
+                          >
+                            <SelectTrigger className="h-7 text-xs">
+                              <SelectValue placeholder={`Move ${i + 1}`} />
+                            </SelectTrigger>
+                            <SelectContent className="max-h-48">
+                              <SelectItem value="">-- None --</SelectItem>
+                              {MOVE_NAMES.map(name => {
+                                const move = MOVES[name];
+                                return (
+                                  <SelectItem key={name} value={name}>
+                                    <span className="flex items-center gap-2">
+                                      <span 
+                                        className="w-2 h-2 rounded-full" 
+                                        style={{ backgroundColor: TYPE_COLORS[move.type] }}
+                                      />
+                                      {name}
+                                    </span>
+                                  </SelectItem>
+                                );
+                              })}
+                            </SelectContent>
+                          </Select>
+                        ))}
+                      </div>
+                    </div>
+
                     {/* Notes */}
                     <div>
                       <label className="text-xs text-muted-foreground mb-1 block">Notes</label>
@@ -697,6 +756,27 @@ function PokemonHeroCard({ pokemon, index, isParty = false }: PokemonHeroCardPro
                         <X className="w-3 h-3" />
                         Cancel
                       </Button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Moves (when not editing) */}
+                {!isEditing && pokemon.moves && pokemon.moves.length > 0 && (
+                  <div className="bg-muted/30 rounded-lg p-3">
+                    <p className="text-xs text-muted-foreground mb-2">Moves</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {pokemon.moves.map((move, i) => (
+                        <div key={i} className="flex items-center gap-2 text-sm">
+                          <span 
+                            className="w-2 h-2 rounded-full flex-shrink-0" 
+                            style={{ backgroundColor: TYPE_COLORS[move.type] }}
+                          />
+                          <span>{move.name}</span>
+                          {move.power && (
+                            <span className="text-muted-foreground text-xs">({move.power})</span>
+                          )}
+                        </div>
+                      ))}
                     </div>
                   </div>
                 )}

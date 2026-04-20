@@ -21,7 +21,10 @@ import {
   BarChart3,
   ListChecks,
   ArrowRight,
+  Wand2,
 } from 'lucide-react';
+import { NicknameGenerator } from '@/components/tools/NicknameGenerator';
+import { RunStatistics as RunStats } from '@/components/dashboard/RunStatistics';
 
 // Evolution data for Gen 1 Pokemon
 const EVOLUTIONS: Record<number, { evolves_to: number; level?: number; item?: string }[]> = {
@@ -130,14 +133,25 @@ export function ExtrasView() {
           {/* Evolution Tracker */}
           <EvolutionTracker />
 
+          {/* Nickname Generator */}
+          <div className="p-4 rounded-xl border bg-card">
+            <div className="flex items-center gap-2 mb-4">
+              <Wand2 className="w-5 h-5 text-purple-500" />
+              <h3 className="font-semibold">Tools</h3>
+            </div>
+            <NicknameGenerator />
+          </div>
+
           {/* Encounter Progress */}
           <EncounterProgress />
 
           {/* Dupes Clause Helper */}
           <DupesClauseHelper />
 
-          {/* Run Statistics */}
-          <RunStatistics />
+          {/* Run Statistics - Enhanced */}
+          <div className="lg:col-span-2">
+            <RunStats />
+          </div>
         </div>
       </div>
     </ScrollArea>
@@ -157,8 +171,8 @@ function EvolutionTracker() {
 
     const pending: Array<{
       pokemon: typeof allPokemon[0];
-      species: ReturnType<typeof POKEMON_SPECIES[number]>;
-      evolvesTo: ReturnType<typeof POKEMON_SPECIES[number]>;
+      species: (typeof POKEMON_SPECIES)[number];
+      evolvesTo: (typeof POKEMON_SPECIES)[number];
       method: string;
       levelsNeeded?: number;
     }> = [];
@@ -392,126 +406,3 @@ function DupesClauseHelper() {
   );
 }
 
-function RunStatistics() {
-  const currentRun = useRunStore((s) => s.currentRun);
-
-  const stats = useMemo(() => {
-    if (!currentRun) return null;
-
-    const allPokemon = Object.values(currentRun.pokemon).filter(Boolean);
-    const activePokemon = allPokemon.filter(p => p.status === 'active');
-    const deadPokemon = allPokemon.filter(p => p.status === 'dead');
-
-    const totalLevels = activePokemon.reduce((sum, p) => sum + p.level, 0);
-    const avgLevel = activePokemon.length > 0 ? Math.round(totalLevels / activePokemon.length) : 0;
-
-    const locations = Object.values(currentRun.locations);
-    const visitedLocations = locations.filter(l => l.status !== 'unvisited');
-    const clearedLocations = locations.filter(l => l.status === 'cleared');
-
-    const totalTrainers = locations.reduce((sum, l) => sum + l.trainers.length, 0);
-    const defeatedTrainers = locations.reduce((sum, l) => sum + (l.defeatedTrainers?.length || 0), 0);
-
-    return {
-      totalCaught: allPokemon.length,
-      active: activePokemon.length,
-      deaths: deadPokemon.length,
-      avgLevel,
-      badges: currentRun.badges.filter(b => b.obtained).length,
-      locationsVisited: visitedLocations.length,
-      locationsCleared: clearedLocations.length,
-      totalLocations: locations.length,
-      trainersDefeated: defeatedTrainers,
-      totalTrainers,
-      money: currentRun.money || 0,
-      playTime: currentRun.playTime || 0,
-    };
-  }, [currentRun]);
-
-  if (!stats) return null;
-
-  const playHours = Math.floor(stats.playTime / 60);
-  const playMinutes = stats.playTime % 60;
-
-  return (
-    <div className="p-4 rounded-xl border bg-card lg:col-span-2">
-      <div className="flex items-center gap-2 mb-4">
-        <BarChart3 className="w-5 h-5 text-primary" />
-        <h3 className="font-semibold">Run Statistics</h3>
-      </div>
-
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <StatCard
-          icon={<Target className="w-4 h-4" />}
-          label="Pokémon Caught"
-          value={stats.totalCaught}
-          color="text-green-500"
-        />
-        <StatCard
-          icon={<Swords className="w-4 h-4" />}
-          label="Active Team"
-          value={`${stats.active} (Avg Lv.${stats.avgLevel})`}
-          color="text-blue-500"
-        />
-        <StatCard
-          icon={<Shield className="w-4 h-4" />}
-          label="Deaths"
-          value={stats.deaths}
-          color="text-red-500"
-        />
-        <StatCard
-          icon={<CheckCircle className="w-4 h-4" />}
-          label="Badges"
-          value={`${stats.badges}/8`}
-          color="text-yellow-500"
-        />
-        <StatCard
-          icon={<Target className="w-4 h-4" />}
-          label="Locations Visited"
-          value={`${stats.locationsVisited}/${stats.totalLocations}`}
-          color="text-purple-500"
-        />
-        <StatCard
-          icon={<Swords className="w-4 h-4" />}
-          label="Trainers Defeated"
-          value={`${stats.trainersDefeated}/${stats.totalTrainers}`}
-          color="text-orange-500"
-        />
-        <StatCard
-          icon={<Zap className="w-4 h-4" />}
-          label="Money"
-          value={`₽${stats.money.toLocaleString()}`}
-          color="text-yellow-600"
-        />
-        <StatCard
-          icon={<Clock className="w-4 h-4" />}
-          label="Play Time"
-          value={playHours > 0 ? `${playHours}h ${playMinutes}m` : `${playMinutes}m`}
-          color="text-gray-500"
-        />
-      </div>
-    </div>
-  );
-}
-
-function StatCard({
-  icon,
-  label,
-  value,
-  color,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string | number;
-  color: string;
-}) {
-  return (
-    <div className="p-3 rounded-lg bg-muted/50">
-      <div className={cn('flex items-center gap-2 mb-1', color)}>
-        {icon}
-        <span className="text-xs font-medium">{label}</span>
-      </div>
-      <p className="text-lg font-bold">{value}</p>
-    </div>
-  );
-}

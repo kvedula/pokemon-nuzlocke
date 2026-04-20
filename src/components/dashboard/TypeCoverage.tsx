@@ -3,6 +3,7 @@
 import React, { useMemo } from 'react';
 import { useRunStore } from '@/store/runStore';
 import { POKEMON_SPECIES, TYPE_COLORS, ALL_TYPES } from '@/data/pokemon';
+import { PokemonType } from '@/types/pokemon';
 import { cn } from '@/lib/utils';
 import {
   AlertTriangle,
@@ -61,7 +62,7 @@ const TYPE_WEAKNESSES: Record<string, string[]> = {
 };
 
 // Gen 1 types only (for FRLG)
-const GEN1_TYPES = ['Normal', 'Fire', 'Water', 'Electric', 'Grass', 'Ice', 'Fighting', 'Poison', 'Ground', 'Flying', 'Psychic', 'Bug', 'Rock', 'Ghost', 'Dragon'];
+const GEN1_TYPES: PokemonType[] = ['Normal', 'Fire', 'Water', 'Electric', 'Grass', 'Ice', 'Fighting', 'Poison', 'Ground', 'Flying', 'Psychic', 'Bug', 'Rock', 'Ghost', 'Dragon'];
 
 interface TypeCoverageProps {
   compact?: boolean;
@@ -199,7 +200,7 @@ export function TypeCoverage({ compact = false }: TypeCoverageProps) {
           const hasCoverage = analysis.offensiveCoverage.includes(type);
           return (
             <Tooltip key={type}>
-              <TooltipTrigger asChild>
+              <TooltipTrigger>
                 <div
                   className={cn(
                     'px-1.5 py-1 rounded text-[10px] font-medium text-center transition-all',
@@ -233,7 +234,7 @@ export function TypeCoverage({ compact = false }: TypeCoverageProps) {
                 <div className="flex items-center gap-2">
                   <span
                     className="px-1.5 py-0.5 rounded text-white text-[10px]"
-                    style={{ backgroundColor: TYPE_COLORS[type] }}
+                    style={{ backgroundColor: TYPE_COLORS[type as PokemonType] }}
                   >
                     {type}
                   </span>

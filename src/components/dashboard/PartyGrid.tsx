@@ -3,8 +3,9 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRunStore } from '@/store/runStore';
-import { Pokemon, Nature } from '@/types';
+import { Pokemon, Nature, PokemonMove } from '@/types';
 import { POKEMON_SPECIES, TYPE_COLORS } from '@/data/pokemon';
+import { MOVES, MOVE_NAMES } from '@/data/moves';
 import { cn } from '@/lib/utils';
 import {
   Heart,
@@ -95,6 +96,7 @@ interface EditFormState {
     speed: string;
   };
   notes: string;
+  moves: string[];
 }
 
 interface PokemonDetailModalProps {
@@ -132,6 +134,7 @@ function PokemonDetailModal({ pokemon, open, onClose, onMoveToBox, onMarkDead, o
           speed: pokemon.stats.speed.toString(),
         },
         notes: pokemon.notes,
+        moves: pokemon.moves?.map(m => m.name) || [],
       });
     }
   }, [pokemon, isEditing]);
@@ -168,6 +171,22 @@ function PokemonDetailModal({ pokemon, open, onClose, onMoveToBox, onMarkDead, o
     const newSpecies = POKEMON_SPECIES[editForm.speciesId];
     const speciesChanged = editForm.speciesId !== pokemon.speciesId;
     
+    // Convert move names to PokemonMove objects
+    const moves: PokemonMove[] = editForm.moves
+      .filter(name => name && MOVES[name])
+      .map(name => {
+        const moveData = MOVES[name];
+        return {
+          name: moveData.name,
+          type: moveData.type,
+          category: moveData.category,
+          power: moveData.power,
+          accuracy: moveData.accuracy,
+          pp: moveData.pp,
+          currentPp: moveData.pp,
+        };
+      });
+    
     onSave({
       nickname: editForm.nickname || pokemon.species,
       speciesId: editForm.speciesId,
@@ -189,6 +208,7 @@ function PokemonDetailModal({ pokemon, open, onClose, onMoveToBox, onMarkDead, o
         speed: parseInt(editForm.stats.speed) || pokemon.stats.speed,
       },
       notes: editForm.notes,
+      moves,
     });
     setIsEditing(false);
     setEditForm(null);
@@ -505,6 +525,66 @@ function PokemonDetailModal({ pokemon, open, onClose, onMoveToBox, onMarkDead, o
                 <p className="font-medium text-sm capitalize">{pokemon.gender}</p>
               )}
             </div>
+          </div>
+
+          {/* Moves */}
+          <div className="bg-muted/30 rounded-lg p-2">
+            <span className="text-muted-foreground text-[10px]">Moves</span>
+            {isEditing && editForm ? (
+              <div className="space-y-1 mt-1">
+                {[0, 1, 2, 3].map((i) => (
+                  <Select
+                    key={i}
+                    value={editForm.moves[i] || ''}
+                    onValueChange={(v) => {
+                      const newMoves = [...editForm.moves];
+                      newMoves[i] = v || '';
+                      setEditForm({ ...editForm, moves: newMoves });
+                    }}
+                  >
+                    <SelectTrigger className="h-6 text-xs">
+                      <SelectValue placeholder={`Move ${i + 1}`} />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-48">
+                      <SelectItem value="">-- None --</SelectItem>
+                      {MOVE_NAMES.map(name => {
+                        const move = MOVES[name];
+                        return (
+                          <SelectItem key={name} value={name}>
+                            <span className="flex items-center gap-2">
+                              <span 
+                                className="w-2 h-2 rounded-full" 
+                                style={{ backgroundColor: TYPE_COLORS[move.type] }}
+                              />
+                              {name} ({move.type})
+                            </span>
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-0.5 mt-1">
+                {pokemon.moves && pokemon.moves.length > 0 ? (
+                  pokemon.moves.map((move, i) => (
+                    <div key={i} className="flex items-center gap-1.5 text-xs">
+                      <span 
+                        className="w-2 h-2 rounded-full flex-shrink-0" 
+                        style={{ backgroundColor: TYPE_COLORS[move.type] }}
+                      />
+                      <span>{move.name}</span>
+                      {move.power && (
+                        <span className="text-muted-foreground">({move.power})</span>
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-xs text-muted-foreground">No moves set</p>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Met Info */}

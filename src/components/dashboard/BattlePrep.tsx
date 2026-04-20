@@ -120,6 +120,13 @@ export function BattlePrep() {
   
   const levelCap = getLevelCap(badgeCount);
   
+  // Get specialty type if available (gym leaders and elite four have it, champion doesn't)
+  const bossSpecialty: PokemonType | null = useMemo(() => {
+    if (!nextBoss) return null;
+    if ('specialty' in nextBoss) return nextBoss.specialty as PokemonType;
+    return null;
+  }, [nextBoss]);
+  
   const matchups = useMemo(() => {
     if (!nextBoss || !partyPokemon.length) return [];
     
@@ -226,12 +233,14 @@ export function BattlePrep() {
               <p className="text-xs text-muted-foreground mt-0.5">{nextBoss.title}</p>
             </div>
             <div className="text-right">
-              <span 
-                className="px-2 py-0.5 rounded text-xs font-semibold text-white"
-                style={{ backgroundColor: TYPE_COLORS[nextBoss.specialty] }}
-              >
-                {nextBoss.specialty}
-              </span>
+              {bossSpecialty && (
+                <span 
+                  className="px-2 py-0.5 rounded text-xs font-semibold text-white"
+                  style={{ backgroundColor: TYPE_COLORS[bossSpecialty] }}
+                >
+                  {bossSpecialty}
+                </span>
+              )}
               <p className="text-xs text-muted-foreground mt-1">
                 Level Cap: {nextBoss.levelCap}
               </p>

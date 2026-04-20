@@ -33,13 +33,13 @@ export function RecentActivity() {
 
     // Get Pokemon events
     Object.values(currentRun.pokemon).forEach(pokemon => {
-      if (pokemon.caughtAt) {
+      if (pokemon.capturedDate) {
         items.push({
           id: `catch-${pokemon.id}`,
           type: 'catch',
           title: `Caught ${pokemon.nickname}`,
-          description: `Lv.${pokemon.level} ${pokemon.species} at ${pokemon.metLocation || 'Unknown'}`,
-          timestamp: pokemon.caughtAt,
+          description: `Lv.${pokemon.metLevel || pokemon.level} ${pokemon.species} at ${pokemon.encounteredAt || 'Unknown'}`,
+          timestamp: pokemon.capturedDate,
           icon: CircleDot,
           color: 'text-green-500',
         });
@@ -50,7 +50,7 @@ export function RecentActivity() {
           type: 'death',
           title: `Lost ${pokemon.nickname}`,
           description: pokemon.deathCause,
-          timestamp: pokemon.caughtAt || new Date().toISOString(),
+          timestamp: pokemon.deathDate || pokemon.capturedDate || new Date().toISOString(),
           icon: Skull,
           color: 'text-red-500',
         });
@@ -58,13 +58,13 @@ export function RecentActivity() {
     });
 
     // Get badge events
-    currentRun.badges.filter(b => b.obtained && b.obtainedAt).forEach(badge => {
+    currentRun.badges.filter(b => b.obtained && b.obtainedDate).forEach(badge => {
       items.push({
         id: `badge-${badge.id}`,
         type: 'badge',
         title: `Obtained ${badge.name}`,
-        description: `Defeated ${badge.leader}`,
-        timestamp: badge.obtainedAt!,
+        description: `Defeated ${badge.gymLeader}`,
+        timestamp: badge.obtainedDate!,
         icon: Trophy,
         color: 'text-yellow-500',
       });
