@@ -5,7 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useRunStore } from '@/store/runStore';
 import { useUIStore } from '@/store/uiStore';
 import { POKEMON_SPECIES, getPokemonByName } from '@/data/pokemon';
-import { Pokemon, PokemonStats } from '@/types';
+import { MOVES } from '@/data/moves';
+import { Pokemon, PokemonStats, PokemonMove } from '@/types';
 import { cn } from '@/lib/utils';
 import {
   X,
@@ -52,6 +53,7 @@ interface RunContext {
     species: string;
     level: number;
     types: string[];
+    moves: string[];
   }>;
   boxCount: number;
   graveyardCount: number;
@@ -101,7 +103,10 @@ interface ActionHandlers {
   catchPokemon: (speciesName: string, nickname: string, level: number, locationId: string) => string | null;
   updatePokemon: (nickname: string, field: string, value: string) => boolean;
   updatePokemonStats: (nickname: string, stats: PokemonStats) => boolean;
+  updatePokemonMoves: (nickname: string, moves: string[]) => boolean;
   evolvePokemon: (nickname: string, newSpeciesName: string) => boolean;
+  movePokemonToBox: (nickname: string) => boolean;
+  movePokemonToParty: (nickname: string) => boolean;
   getPokemonByNickname: (nickname: string) => Pokemon | null;
   updateInventory: (itemName: string, quantity: number, category: string) => void;
   updateMoney: (amount: number) => void;
@@ -232,6 +237,19 @@ function parseActions(content: string, handlers: ActionHandlers): { cleanedConte
   }
   cleanedContent = cleanedContent.replace(updateStatsRegex, '');
   
+  // Update Pokemon moves actions
+  const updateMovesRegex = /\[ACTION:updatePokemonMoves:([^|]+)\|([^\]]+)\]/g;
+  while ((match = updateMovesRegex.exec(content)) !== null) {
+    const [, nickname, movesStr] = match;
+    const moves = movesStr.split(',').map(m => m.trim()).filter(m => m);
+    setTimeout(() => handlers.updatePokemonMoves(nickname, moves), 100);
+    executedActions.push({ 
+      type: 'moves', 
+      description: `Updated ${nickname}'s moves: ${moves.join(', ')}` 
+    });
+  }
+  cleanedContent = cleanedContent.replace(updateMovesRegex, '');
+  
   // Evolve Pokemon actions
   const evolveRegex = /\[ACTION:evolvePokemon:([^|]+)\|([^\]]+)\]/g;
   while ((match = evolveRegex.exec(content)) !== null) {
@@ -243,6 +261,30 @@ function parseActions(content: string, handlers: ActionHandlers): { cleanedConte
     });
   }
   cleanedContent = cleanedContent.replace(evolveRegex, '');
+  
+  // Move Pokemon to box actions
+  const toBoxRegex = /\[ACTION:movePokemonToBox:([^\]]+)\]/g;
+  while ((match = toBoxRegex.exec(content)) !== null) {
+    const nickname = match[1];
+    setTimeout(() => handlers.movePokemonToBox(nickname), 100);
+    executedActions.push({ 
+      type: 'box', 
+      description: `Moved ${nickname} to PC Box` 
+    });
+  }
+  cleanedContent = cleanedContent.replace(toBoxRegex, '');
+  
+  // Move Pokemon to party actions
+  const toPartyRegex = /\[ACTION:movePokemonToParty:([^\]]+)\]/g;
+  while ((match = toPartyRegex.exec(content)) !== null) {
+    const nickname = match[1];
+    setTimeout(() => handlers.movePokemonToParty(nickname), 100);
+    executedActions.push({ 
+      type: 'party', 
+      description: `Moved ${nickname} to party` 
+    });
+  }
+  cleanedContent = cleanedContent.replace(toPartyRegex, '');
   
   // Inventory actions
   const itemRegex = /\[ACTION:setItem:([^|]+)\|(\d+)\|(\w+)\]/g;
@@ -427,6 +469,8 @@ export function ChatBar() {
   const updateLocation = useRunStore((s) => s.updateLocation);
   const addPokemon = useRunStore((s) => s.addPokemon);
   const updatePokemonStore = useRunStore((s) => s.updatePokemon);
+  const movePokemonToBoxStore = useRunStore((s) => s.movePokemonToBox);
+  const movePokemonToPartyStore = useRunStore((s) => s.movePokemonToParty);
   const updateInventory = useRunStore((s) => s.updateInventory);
   const updateMoney = useRunStore((s) => s.updateMoney);
   const updatePlayTime = useRunStore((s) => s.updatePlayTime);
@@ -492,13 +536,24 @@ export function ChatBar() {
 
   const getPokemonByNickname = useCallback((nickname: string): Pokemon | null => {
     if (!currentRun) return null;
-    const normalizedNickname = nickname.toLowerCase();
+    const normalizedName = nickname.toLowerCase();
+    
+    // First try to match by nickname
     for (const id of [...currentRun.party, ...currentRun.box]) {
       const pokemon = currentRun.pokemon[id];
-      if (pokemon && pokemon.nickname.toLowerCase() === normalizedNickname) {
+      if (pokemon && pokemon.nickname.toLowerCase() === normalizedName) {
         return pokemon;
       }
     }
+    
+    // If no match by nickname, try matching by species name
+    for (const id of [...currentRun.party, ...currentRun.box]) {
+      const pokemon = currentRun.pokemon[id];
+      if (pokemon && pokemon.species.toLowerCase() === normalizedName) {
+        return pokemon;
+      }
+    }
+    
     return null;
   }, [currentRun]);
 
@@ -538,6 +593,30 @@ export function ChatBar() {
     return true;
   }, [getPokemonByNickname, updatePokemonStore]);
 
+  const updatePokemonMoves = useCallback((nickname: string, moveNames: string[]): boolean => {
+    const pokemon = getPokemonByNickname(nickname);
+    if (!pokemon) return false;
+    
+    const moves: PokemonMove[] = [];
+    for (const name of moveNames.slice(0, 4)) {
+      const moveData = MOVES[name];
+      if (moveData) {
+        moves.push({
+          name: moveData.name,
+          type: moveData.type,
+          category: moveData.category,
+          power: moveData.power,
+          accuracy: moveData.accuracy,
+          pp: moveData.pp,
+          currentPp: moveData.pp,
+        });
+      }
+    }
+    
+    updatePokemonStore(pokemon.id, { moves });
+    return true;
+  }, [getPokemonByNickname, updatePokemonStore]);
+
   const evolvePokemon = useCallback((nickname: string, newSpeciesName: string): boolean => {
     const pokemon = getPokemonByNickname(nickname);
     if (!pokemon) return false;
@@ -562,6 +641,22 @@ export function ChatBar() {
     
     return true;
   }, [getPokemonByNickname, updatePokemonStore, markPokemonCaught]);
+
+  const movePokemonToBox = useCallback((nickname: string): boolean => {
+    const pokemon = getPokemonByNickname(nickname);
+    if (!pokemon) return false;
+    
+    movePokemonToBoxStore(pokemon.id);
+    return true;
+  }, [getPokemonByNickname, movePokemonToBoxStore]);
+
+  const movePokemonToParty = useCallback((nickname: string): boolean => {
+    const pokemon = getPokemonByNickname(nickname);
+    if (!pokemon) return false;
+    
+    movePokemonToPartyStore(pokemon.id);
+    return true;
+  }, [getPokemonByNickname, movePokemonToPartyStore]);
 
   const syncProgressTo = useCallback((targetLocationId: string): { locationsVisited: number; trainersDefeated: number } => {
     if (!currentRun) return { locationsVisited: 0, trainersDefeated: 0 };
@@ -653,7 +748,10 @@ export function ChatBar() {
     catchPokemon,
     updatePokemon,
     updatePokemonStats,
+    updatePokemonMoves,
     evolvePokemon,
+    movePokemonToBox,
+    movePokemonToParty,
     getPokemonByNickname,
     updateInventory,
     updateMoney,
@@ -675,6 +773,7 @@ export function ChatBar() {
         species: speciesData?.name || pokemon?.species || 'Unknown',
         level: pokemon?.level || 1,
         types: speciesData?.types || pokemon?.types || [],
+        moves: pokemon?.moves?.map(m => m.name) || [],
       };
     });
 
@@ -863,7 +962,10 @@ export function ChatBar() {
                                     {action.type === 'navigate' && <Navigation className="w-3 h-3" />}
                                     {action.type === 'catch' && <Circle className="w-3 h-3" />}
                                     {action.type === 'update' && <BarChart3 className="w-3 h-3" />}
+                                    {action.type === 'moves' && <Swords className="w-3 h-3" />}
                                     {action.type === 'evolve' && <TrendingUp className="w-3 h-3" />}
+                                    {action.type === 'box' && <Package className="w-3 h-3" />}
+                                    {action.type === 'party' && <Circle className="w-3 h-3" />}
                                     {action.type === 'inventory' && <Package className="w-3 h-3" />}
                                     {action.type === 'money' && <Coins className="w-3 h-3" />}
                                     {action.type === 'playtime' && <Clock className="w-3 h-3" />}

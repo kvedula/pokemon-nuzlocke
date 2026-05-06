@@ -171,6 +171,28 @@ export function LocationDrawer({ location, onClose, onSetCurrent, onSetSave }: L
               {isSavePoint ? 'Saved Here' : 'Save Here'}
             </Button>
           </div>
+          
+          {/* Mark Visited Toggle */}
+          <div className="flex gap-2 mt-2">
+            <Button
+              variant={location.status === 'cleared' || location.status === 'visited' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => {
+                if (location.status === 'cleared' || location.status === 'visited') {
+                  updateLocation(location.id, { status: 'unvisited' });
+                } else {
+                  updateLocation(location.id, { status: 'cleared' });
+                }
+              }}
+              className={cn(
+                "flex-1",
+                (location.status === 'cleared' || location.status === 'visited') && "bg-purple-600 hover:bg-purple-700"
+              )}
+            >
+              <CheckCircle className="w-4 h-4 mr-2" />
+              {location.status === 'cleared' || location.status === 'visited' ? 'Visited' : 'Mark Visited'}
+            </Button>
+          </div>
         </div>
 
         {/* Content */}

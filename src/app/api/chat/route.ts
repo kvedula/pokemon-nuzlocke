@@ -16,6 +16,7 @@ interface RunContext {
     species: string;
     level: number;
     types: string[];
+    moves: string[];
   }>;
   boxCount: number;
   graveyardCount: number;
@@ -59,7 +60,12 @@ When the user tells you they've completed something, you can perform actions usi
 ### Location Updates
 - [ACTION:defeatAllTrainers:LOCATION_ID] - Mark all trainers at a location as defeated
 - [ACTION:setLocation:LOCATION_ID] - Set current location
-- [ACTION:markVisited:LOCATION_ID] - Mark a location as visited/cleared (use when player mentions they did something at a location)
+- [ACTION:markVisited:LOCATION_ID] - Mark a location as visited/cleared
+  Use this when player says: "I visited X", "I completed X", "I cleared X", "I went to X", "I finished X", "mark X as visited", "mark X as complete"
+  Examples:
+  - "I visited Bill's House" → [ACTION:markVisited:bills-house]
+  - "I completed Cerulean Gym" → [ACTION:markVisited:cerulean-gym] AND [ACTION:obtainBadge:cascade]
+  - "Mark Diglett's Cave as visited" → [ACTION:markVisited:digletts-cave]
 
 ### Pokémon Management
 - [ACTION:catchPokemon:SPECIES_NAME|NICKNAME|LEVEL|LOCATION_ID] - Add a caught Pokémon to party
@@ -73,11 +79,25 @@ When the user tells you they've completed something, you can perform actions usi
 
 - [ACTION:updatePokemonStats:NICKNAME|HP|ATK|DEF|SPATK|SPDEF|SPEED] - Update all stats at once
   Example: [ACTION:updatePokemonStats:Sparky|45|55|40|50|50|90]
+  Example: [ACTION:updatePokemonStats:Blastoise|130|75|104|85|95|95]
+  IMPORTANT: Use the Pokemon's NICKNAME (or species name if no nickname), and stats in order: HP|Attack|Defense|SpAtk|SpDef|Speed
+
+- [ACTION:updatePokemonMoves:NICKNAME|MOVE1,MOVE2,MOVE3,MOVE4] - Update a Pokémon's moves (up to 4 moves, comma-separated)
+  Example: [ACTION:updatePokemonMoves:Sparky|Thunder Shock,Quick Attack,Tail Whip,Growl]
+  Example: [ACTION:updatePokemonMoves:Blastoise|Surf,Ice Beam,Earthquake,Hydro Pump]
+  Use exact move names from the game (e.g., "Thunder Shock" not "Thundershock", "Ice Beam" not "Icebeam")
 
 - [ACTION:evolvePokemon:NICKNAME|NEW_SPECIES_NAME] - Evolve a Pokémon to a new species
   Example: [ACTION:evolvePokemon:Squirty|Wartortle] - Evolve Squirty from Squirtle to Wartortle
   Example: [ACTION:evolvePokemon:Squirty|Blastoise] - Evolve Squirty from Wartortle to Blastoise
   Use this when player mentions their Pokémon evolved or has a Pokémon at a higher evolution stage than originally caught
+
+- [ACTION:movePokemonToBox:NICKNAME] - Move a Pokémon from party to PC Box
+  Example: [ACTION:movePokemonToBox:Magikarp] - Move Magikarp to the PC Box
+  Use this when a user's team update doesn't include a Pokémon that was previously in their party
+
+- [ACTION:movePokemonToParty:NICKNAME] - Move a Pokémon from PC Box to party (if party has space)
+  Example: [ACTION:movePokemonToParty:Snorlax] - Move Snorlax from box to party
 
 ### Inventory Management
 - [ACTION:setItem:ITEM_NAME|QUANTITY|CATEGORY] - Set item quantity in bag
@@ -119,12 +139,25 @@ Gyms (only mark when player beats gym leader): pewter-gym, cerulean-gym, vermili
 Location IDs: pallet-town, route-1, viridian-city, route-2, viridian-forest, pewter-city, pewter-gym, pewter-museum, route-3, mt-moon, route-4, cerulean-city, cerulean-gym, route-24, route-25, route-5, route-6, vermilion-city, vermilion-gym, ss-anne, route-11, digletts-cave, route-9, route-10, rock-tunnel, lavender-town, pokemon-tower, route-8, route-7, celadon-city, celadon-gym, rocket-hideout, route-16, route-17, route-18, fuchsia-city, fuchsia-gym, safari-zone, route-12, route-13, route-14, route-15, power-plant, route-19, route-20, seafoam-islands, cinnabar-island, cinnabar-gym, pokemon-mansion, route-21, route-22, route-23, victory-road, indigo-plateau, viridian-gym
 
 ## Guidelines
+- When a user says "I visited X", "I completed X", "I cleared X", "I went to X", or "mark X as visited", use markVisited to mark that location as cleared
 - When a user says they "beat", "defeated", or "cleared" something, use the appropriate action
-- When they mention beating a gym leader, mark the badge AND offer to mark all gym trainers as defeated
+- When they mention beating a gym leader, mark the badge AND use markVisited for the gym location AND offer to mark all gym trainers as defeated
 - When a user mentions picking up an item, getting something, or doing anything at a specific location, use markVisited to mark that location as cleared
 - When they say they "caught" a Pokémon, ask for the nickname and level if not provided, then add it
-- When they provide stats for a Pokémon, use updatePokemonStats to save them
-- When a user mentions having an evolved Pokémon (e.g., "I have a Wartortle" when they originally caught Squirtle), use evolvePokemon to update the species
+- **BULK TEAM UPDATES**: When a user provides a full team update with stats and moves for multiple Pokémon, you MUST generate ALL the actions for EACH Pokémon:
+  - For EACH Pokémon in their update, generate: updatePokemonStats AND updatePokemonMoves
+  - If a Pokémon species changed (e.g., Wartortle is now Blastoise), also generate evolvePokemon
+  - If a Pokémon from the current party is NOT in their update, generate movePokemonToBox
+  - Example: If user says "Blastoise HP 130 Attack 75..." and current party has Wartortle, generate:
+    [ACTION:evolvePokemon:Wartortle|Blastoise]
+    [ACTION:updatePokemonStats:Blastoise|130|75|104|85|95|95]
+    [ACTION:updatePokemonMoves:Blastoise|Water Gun,Dig,Bubble,Rain Dance]
+- When they provide stats for a Pokémon (HP, Attack, Defense, Sp Atk, Sp Def, Speed), use updatePokemonStats to save them
+- When a user mentions their Pokémon's moves, use updatePokemonMoves to save them
+- When a user says their Pokémon "learned" a move, update their moves with updatePokemonMoves including the new move and removing an old one if they specify which to forget
+- When a user mentions having an evolved Pokémon (e.g., "I have a Blastoise" when they originally caught Squirtle), use evolvePokemon to update the species
+- **IMPORTANT**: When a user gives you a team update that doesn't include a Pokémon that's currently in their party, use movePokemonToBox to move it to the PC Box
+- When a user wants to swap party members, use movePokemonToBox for the one leaving and movePokemonToParty for the one joining
 - When they say they "bought" or "picked up" items, update their inventory with setItem
 - When they say they "used" an item, decrease the quantity (e.g., if they had 10 Potions and used 1, set to 9)
 - When they mention their money, winnings from battles, or spending, update with setMoney
@@ -158,7 +191,8 @@ export async function POST(request: NextRequest) {
 - Badges: ${runContext.badges}/8
 - Current Location: ${runContext.currentLocation}
 - Save Location: ${runContext.saveLocation}
-- Party (${runContext.party.length}/6): ${runContext.party.map((p: RunContext['party'][0]) => `${p.name} (${p.species} Lv.${p.level}, ${p.types.join('/')})`).join(', ') || 'Empty'}
+- Party (${runContext.party.length}/6):
+${runContext.party.map((p: RunContext['party'][0]) => `  • ${p.name} (${p.species} Lv.${p.level}, ${p.types.join('/')})${p.moves.length > 0 ? ` - Moves: ${p.moves.join(', ')}` : ''}`).join('\n') || '  Empty'}
 - Box: ${runContext.boxCount} Pokémon
 - Graveyard: ${runContext.graveyardCount} deaths
 - Pokédex: ${runContext.pokedexCaught} caught, ${runContext.pokedexSeen} seen`

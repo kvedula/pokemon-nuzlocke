@@ -271,6 +271,12 @@ export const MOVES: Record<string, MoveData> = {
   'Meteor Mash': { name: 'Meteor Mash', type: 'Steel', category: 'Physical', power: 100, accuracy: 85, pp: 10, description: 'May raise Attack.' },
   'Iron Defense': { name: 'Iron Defense', type: 'Steel', category: 'Status', power: null, accuracy: null, pp: 15, description: 'Sharply raises Defense.' },
   'Metal Sound': { name: 'Metal Sound', type: 'Steel', category: 'Status', power: null, accuracy: 85, pp: 40, description: 'Sharply lowers Sp. Def.' },
+  
+  // Additional moves (FRLG/later gens)
+  'False Swipe': { name: 'False Swipe', type: 'Normal', category: 'Physical', power: 40, accuracy: 100, pp: 40, description: 'Always leaves foe with at least 1 HP.' },
+  'Sharpen': { name: 'Sharpen', type: 'Normal', category: 'Status', power: null, accuracy: null, pp: 30, description: 'Raises user\'s Attack.' },
+  'Conversion': { name: 'Conversion', type: 'Normal', category: 'Status', power: null, accuracy: null, pp: 30, description: 'Changes user\'s type to match a move.' },
+  'Conversion 2': { name: 'Conversion 2', type: 'Normal', category: 'Status', power: null, accuracy: null, pp: 30, description: 'Changes type to resist last hit.' },
 };
 
 // Get all move names for autocomplete
